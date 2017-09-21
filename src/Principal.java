@@ -50,21 +50,11 @@ public class Principal {
         LexerGenerator lexerGenerator = new LexerGenerator();
 
         System.out.println("Archivo generado!");
-        ArrayList<String> lista = new ArrayList<>();
-        lista.add("if");
-        lista.add("while");
-        lista.add("for");
-        String texto = "def keyword(palabra):\n"+
-                "\tlista = " +  lista.toString() +"\n"+
-                "\tif palabra in lista:\n"+
-                "\t\treturn True,lista[lista.index(palabra)]\n"+
-                "\telse:\n"+
-                "\t\treturn False,\"\"\n";
-
+        String texto = "";
 
         try {
             Writer output;
-            output = new BufferedWriter(new FileWriter(System.getProperty("user.dir") + "\\Prueba.py"));  //clears file every time
+            output = new BufferedWriter(new FileWriter(System.getProperty("user.dir") + "\\Prueba.java"));  //clears file every time
             output.append(texto);
             output.close();
         }catch (IOException e)
