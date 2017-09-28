@@ -51,7 +51,7 @@ public class Principal {
         try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
             String line;
             while ((line = br.readLine()) != null) {
-                if(!line.equals(""))
+                if(!line.isEmpty())
                 arreglodeDeLineas.add(line);
             }
         }

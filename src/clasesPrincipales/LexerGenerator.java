@@ -50,7 +50,7 @@ public class LexerGenerator {
                     System.out.print(linea.replace("/", ""));
                     continue;
                 }
-                String[] lineaseparada = linea.split(" ");
+                String[] lineaseparada = linea.split("\\s+",0);
                 if(lineaseparada.length == 1){
                     switch (lineaseparada[0]){
                         case "CHARACTERS":
@@ -79,6 +79,13 @@ public class LexerGenerator {
                     else if (cojunto == "CHARACTERS"){
                         arreglorCharacters.add(lineaseparada[0]);
                         if (lineaseparada[2].contains("+")){
+                            if (lineaseparada[2].equals("\'+\'.")){
+                                String contenido = "+";
+                                arregloContentCharacters.add(contenido);
+                                arreglorRegexCharacters.add(contenido);
+                                charactersMethod(lineaseparada[0], contenido);
+                                continue;
+                            }
                             String[] itemsSeparados = lineaseparada[2].split("\\+");
                             itemsSeparados[itemsSeparados.length-1] = itemsSeparados[itemsSeparados.length-1].substring(0,itemsSeparados[itemsSeparados.length-1].length()-1);
                             String cadenaNueva = "";
@@ -107,25 +114,37 @@ public class LexerGenerator {
                             charactersMethod(lineaseparada[0], cadenaNueva);
                         }
                         else{
-                            String contenido = prepareString(lineaseparada[2]);
-                            arregloContentCharacters.add(contenido);
-                            arreglorRegexCharacters.add(automataRegexGenerator(contenido));
-                            charactersMethod(lineaseparada[0], contenido);
+                            String cadenaNueva = "";
+                            if (lineaseparada[2].contains("'A'..'Z'")) {
+                                cadenaNueva += azMayus;
+                            } else if (lineaseparada[2].contains("'a'..'z'")) {
+                                cadenaNueva += azMinus;
+                            } else if (lineaseparada[2].contains("'0'..'9'")) {
+                                cadenaNueva += numero09;
+                            }
+                            else if (lineaseparada[2].contains("\'") || lineaseparada[2].contains("\"")){
+                                cadenaNueva += prepareString(lineaseparada[2]);
+                            }
+                            arregloContentCharacters.add(cadenaNueva);
+                            arreglorRegexCharacters.add(automataRegexGenerator(cadenaNueva));
+                            charactersMethod(lineaseparada[0], cadenaNueva);
                         }
                     }
                     else if (cojunto == "TOKENS"){
                         String cadenaNueva = "";
                         String tokenDec = lineaseparada[2].substring(0, lineaseparada[2].length()-1);
+                        String tokenDecTemp = tokenDec;
                         for (String cojuntoPrevio: arreglorCharacters) {
                             if (tokenDec.contains(cojuntoPrevio)){
                                 String reemplazo = arreglorRegexCharacters.get(arreglorCharacters.indexOf(cojuntoPrevio));
-                                cadenaNueva = tokenDec.replace(cojuntoPrevio, reemplazo);
+                                cadenaNueva = tokenDecTemp.replace(cojuntoPrevio, reemplazo);
+                                tokenDecTemp = cadenaNueva;
                             }
                         }
-                        cadenaNueva = cadenaNueva.replace("{","");
-                        cadenaNueva = cadenaNueva.replace("}","*");
-                        cadenaNueva = cadenaNueva.replace("[","");
-                        cadenaNueva = cadenaNueva.replace("]","?");
+                        cadenaNueva = cadenaNueva.replace("{","(");
+                        cadenaNueva = cadenaNueva.replace("}",")*");
+                        cadenaNueva = cadenaNueva.replace("[","(");
+                        cadenaNueva = cadenaNueva.replace("]",")?");
                         cadenaNueva = cadenaNueva.replace("\"","");
                         cadenaNueva = cadenaNueva.replace("\'","");
                         //System.out.println(cadenaNueva);
@@ -153,7 +172,7 @@ public class LexerGenerator {
             return s2;
         }
         else {
-            String s2 =  s.substring(1,s.length()-1);
+            String s2 = s.substring(1,s.length()-1);
             return s2;
         }
     }

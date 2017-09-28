@@ -14,6 +14,42 @@ public class Lexer {
 
     private static String  textoDeSalida = "";
     private static SuperClaseHiperMegaPro laClase = new SuperClaseHiperMegaPro();
+    private static boolean isletter(String entrada) {
+        String tokenName = "letter";
+        String conjunto = "ABCDFGHIJKLMNOPQRSTUVWXYZabcdfghijklmnopqrstuvwxyz";
+        boolean respuesta = conjunto.contains(entrada);
+        if (respuesta) {
+            //textoDeSalida += String.format("<%s, \"%s\"> ",tokenName, entrada);
+            textoDeSalida += String.format("<%s> ", tokenName);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    private static boolean isdigit(String entrada) {
+        String tokenName = "digit";
+        String conjunto = "0123456789";
+        boolean respuesta = conjunto.contains(entrada);
+        if (respuesta) {
+            //textoDeSalida += String.format("<%s, \"%s\"> ",tokenName, entrada);
+            textoDeSalida += String.format("<%s> ", tokenName);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    private static boolean isplus(String entrada) {
+        String tokenName = "plus";
+        String conjunto = "+";
+        boolean respuesta = conjunto.contains(entrada);
+        if (respuesta) {
+            //textoDeSalida += String.format("<%s, \"%s\"> ",tokenName, entrada);
+            textoDeSalida += String.format("<%s> ", tokenName);
+            return true;
+        } else {
+            return false;
+        }
+    }
     private static boolean isKeyword(String entrada){
         String tokenName = "keyword";
         String[] listaDeKeywords = {"palabra reseadaque no hace mach"};
@@ -48,9 +84,17 @@ public class Lexer {
             catch (IOException e){
             }
         }
+		Automata isident = laClase.analizador(RegExConverter.infixToPostfix("(A|B|C|D|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*"));
+		Automata isident1 = laClase.analizador(RegExConverter.infixToPostfix("(A|B|C|D|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)(_)**"));
 for(String linea: lineas){
-            for(String palabra: linea.split(" ")){
+            for(String palabra: linea.split("//s+")){
                 if(isKeyword(palabra)){
+                }
+                else if(laClase.simuladorNFA(isident,palabra)){
+                    textoDeSalida += " <ident> ";
+                }
+                else if(laClase.simuladorNFA(isident1,palabra)){
+                    textoDeSalida += " <ident1> ";
                 }
 else {
                     textoDeSalida += "No reconocida ";
