@@ -1,3 +1,5 @@
+package clasesPrincipales;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -407,8 +409,8 @@ public class SuperClaseHiperMegaPro {
         //tranciones y lo compara con el conkunto de estados de cada EstadoDFA en el automata
         for(TrancisionesAFD t: dTransicnoes) {
             HashSet<EstadoAFD> estadosDeAFD = automataAFD.getEstados();
-          //  EstadoAFD nuevoInical = null;
-          //  EstadoAFD nuevoFinal = null;
+          //  clasesPrincipales.EstadoAFD nuevoInical = null;
+          //  clasesPrincipales.EstadoAFD nuevoFinal = null;
             //verifica y crea la referencia que se utiliza para crear la trancision
             for (EstadoAFD e: estadosDeAFD) {
                 if (e.getEstadosQueContiene().equals(t.getConjuntoOrigen().getEstadosQueContiene())) {

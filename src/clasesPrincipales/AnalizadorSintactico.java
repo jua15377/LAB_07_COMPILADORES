@@ -1,10 +1,12 @@
+package clasesPrincipales;
+
 import java.util.ArrayList;
 
 
 public class AnalizadorSintactico {
     private SuperClaseHiperMegaPro clase = new SuperClaseHiperMegaPro();
     private final String identRegex = "(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|0|1|2|3|4|5|6|7|8|9)*";
-    private final String NUMBERREGEX = "(0|1|2|3|4|5|6|7|8|9)*";
+    private final String NUMBERREGEX = "(0|1|2|3|4|5|6|7|8|9)(0|1|2|3|4|5|6|7|8|9)*";
     private Automata automataIdent;
     private Automata automatanumber;
 
@@ -58,7 +60,7 @@ public class AnalizadorSintactico {
         int numnOfLine = 1;
         boolean banderaDeCaracter =false;
         boolean banderaDeKeyword = false;
-        boolean banderawitheSpace = false;
+        boolean banderaDEToken = false;
         for (String linea: texto){
             // si no es una linea en blanco
             if(!linea.equals("")){
@@ -72,39 +74,78 @@ public class AnalizadorSintactico {
                 String[] lineaseparada = linea.split(" ");
 
                 //System.out.println(lineaseparada.length);
+                //verifica si son una de las palabras que delimitan el contenido
                 if(lineaseparada.length == 1){
                     switch (lineaseparada[0]){
                         case "CHARACTERS":
                             banderaDeCaracter = true;
                             banderaDeKeyword = false;
-                            banderawitheSpace = false;
+                            banderaDEToken = false;
                             break;
                         case "KEYWORDS":
                             banderaDeKeyword = true;
                             banderaDeCaracter = false;
-                            banderawitheSpace = false;
+                            banderaDEToken = false;
                             break;
                         default:
                             //error si no hay separacion entre palabras y no es una palabra reservada de cocol
                             System.out.println("Syntax error! --> can't resolve symbol as a reserved word. line: " + numnOfLine);
                     }
                 }
+                else if (lineaseparada.length == 2){
+                    if(lineaseparada[0].equals("COMPILER") || lineaseparada[0].equals("END")){
+
+                    }
+                    else if (!lineaseparada[0].equals("IGNORE")){
+                        System.out.println("Syntax error! --> can't resolve symbol as a reserved word. line: " + numnOfLine);
+                    }
+                    else {
+                        if(checkEndLine(lineaseparada[1])){
+                            String s = prepareString(lineaseparada[1]);
+                            //se debe mejorar
+                            if (s.contains("\"")){
+                                System.out.println("Syntax error! -->not a set. Line: " + numnOfLine);
+                            }
+                            else {
+                                //no tiene errores.
+                                numnOfLine ++;
+                                continue;
+                            }
+                        }
+                    }
+                }
                 //deben ser tres elementos con la estructura ident = alguna otra cosa
                 else if (lineaseparada.length == 3){
-                    //System.out.println(lineaseparada[0]);
-                    //System.out.println(lineaseparada[1]);
-                    //System.out.println(lineaseparada[2]);
+
                     if(checkEndLine(lineaseparada[2])) {
                         //verificar el ident
                         if (ident(lineaseparada[0])) {
                             //verificar el signo
                             if (lineaseparada[1].equals("=")) {
                                 if (banderaDeCaracter) {
+                                    String s = prepareString(lineaseparada[2]);
+                                    if (s.contains("\"") && !s.contains("+")){
+                                        System.out.println("Syntax error! -->not a set Line: " + numnOfLine);
+                                    }
+                                    if (s.contains("+")){
+                                        //por ahora continue
+                                        numnOfLine ++;
+                                        continue;
+                                    }
                                 }
                                 else if (banderaDeKeyword) {
+                                    String s = prepareString(lineaseparada[2]);
+                                    if (s.contains("\"")){
+                                        System.out.println("Syntax error! -->not a set. Line: " + numnOfLine);
+                                    }
+                                    else {
+                                        //no tiene errores.
+                                        numnOfLine ++;
+                                        continue;
+                                    }
                                 }
                                 else {
-                                    System.out.println("Syntax error! -->DEFINIR ERROR: " + numnOfLine);
+                                    System.out.println("Syntax error! -->Bad Declaration Line: " + numnOfLine);
                                 }
                             }
                             else {
@@ -116,8 +157,8 @@ public class AnalizadorSintactico {
                             System.out.println("Syntax error! --> Not a ident  Line:" + numnOfLine);
                         }
                     }
-                else{
-                    System.out.println("Syntax error! --> '.' expected  Line:" + numnOfLine);
+                    else{
+                        System.out.println("Syntax error! --> '.' expected  Line:" + numnOfLine);
                     }
                 }
             }
@@ -134,5 +175,9 @@ public class AnalizadorSintactico {
             return  true;
         }
         else {return false;}
+    }
+    public String prepareString(String s){
+        String s2 =  s.substring(1,s.length()-2);
+        return s2;
     }
 }

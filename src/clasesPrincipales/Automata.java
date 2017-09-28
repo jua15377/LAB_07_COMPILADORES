@@ -1,4 +1,4 @@
-/*
+package clasesPrincipales;/*
 * Tomando de referencia la clase DirectedGraph
 * encontrada en:
 * https://github.com/shaunak1111/Directed-Graph-Implementation-java/blob/master/DirectedGraph.java*/

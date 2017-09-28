@@ -1,0 +1,19 @@
+COMPILER Ejemplo
+
+CHARACTERS
+letter = 'A'..'Z'+'a'..'z'.
+digit = "0123456789".
+hexdigit = digit+"ABCDEF".
+KEYWORDS
+if = "if".
+while = "while".
+
+TOKENS
+id = letter{letter}.
+number = digit{digit}.
+hexnumber = hexdigit{hexdigit}"(H)".
+
+IGNORE "*"
+
+END Ejemplo.
+

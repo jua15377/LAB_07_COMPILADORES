@@ -1,4 +1,4 @@
-//tomado de https://gist.github.com/gmenard/6161825
+package clasesPrincipales;//tomado de https://gist.github.com/gmenard/6161825
 
 import java.util.*;
 
