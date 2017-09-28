@@ -1,3 +1,1 @@
-if cosa
-for 43
-while 17
+hola 1234 567ABC(H) while

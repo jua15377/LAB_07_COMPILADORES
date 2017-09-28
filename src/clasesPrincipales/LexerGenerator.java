@@ -8,19 +8,27 @@ public class LexerGenerator {
     private ArrayList<String> arregloContentCharacters = new ArrayList<>();
     private ArrayList<String> arreglorKeywords = new ArrayList<>();
     private ArrayList<String> arreglorRegexCharacters = new ArrayList<>();
+    private ArrayList<String> arreglorTokenNames = new ArrayList<>();
+    private ArrayList<String> arreglorTokenContent = new ArrayList<>();
 
     public String textoFinal = "package Pruebas;\n" +
-            "import java.io.BufferedReader;\n" +
-            "import java.io.FileReader;\n" +
-            "import java.io.IOException;\n" +
+            "import java.io.*;\n" +
             "import java.util.ArrayList;\n" +
             "import java.util.Arrays;\n" +
             "\n" +
             "import clasesPrincipales.Automata;\n" +
             "import clasesPrincipales.RegExConverter;\n" +
             "import clasesPrincipales.SuperClaseHiperMegaPro;\n" +
+            "\n" +
+            "import javax.swing.*;\n" +
+            "import javax.swing.filechooser.FileNameExtensionFilter;\n" +
+            "\n" +
             "public class Lexer {\n" +
-            "\n    private static String  textoDeSalida = \"\";";
+            "\n" +
+            "    private static String  textoDeSalida = \"\";\n" +
+            "    private static SuperClaseHiperMegaPro laClase = new SuperClaseHiperMegaPro();\n";
+
+
     private String regexAZMayus = "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)";
     private String regexAZMinus = "(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)";
     private String regex09 = "(0|1|2|3|4|5|6|7|8|9)";
@@ -120,8 +128,9 @@ public class LexerGenerator {
                         cadenaNueva = cadenaNueva.replace("]","?");
                         cadenaNueva = cadenaNueva.replace("\"","");
                         cadenaNueva = cadenaNueva.replace("\'","");
-                        System.out.println(cadenaNueva);
-
+                        //System.out.println(cadenaNueva);
+                        arreglorTokenNames.add(lineaseparada[0]);
+                        arreglorTokenContent.add(cadenaNueva);
                     }
                 }
             }
@@ -209,44 +218,58 @@ public class LexerGenerator {
                 "        else {\n" +
                 "            return false;\n" +
                 "        }\n" +
-                "    }";
+                "    }\n";
 
 
     }
     public void principalMethod(){
-         textoFinal += "    public static void main(String[] args){\n" +
+         textoFinal += " public static void main(String[] args){\n" +
+                 "        //filechooser para ver el escoger el archivo que se esta buscando\n" +
+                 "        JFileChooser chooser = new JFileChooser();\n" +
+                 "        chooser.setCurrentDirectory(new java.io.File(\"./src\"));\n" +
+                 "        chooser.setDialogTitle(\"Seleccione su archivo\");\n" +
+                 "        chooser.setFileFilter(new FileNameExtensionFilter(\"Text files (.txt)\", \"txt\"));\n" +
+                 "        int returnVal = chooser.showOpenDialog(null);\n" +
                  "        ArrayList<String> lineas = new ArrayList<>();\n" +
-                 "        try (BufferedReader br = new BufferedReader(new FileReader(\"test2.txt\"))) {\n" +
-                 "            String line;\n" +
-                 "            while ((line = br.readLine()) != null) {\n" +
-                 "                if(!line.equals(\"\"))\n" +
-                 "                    lineas.add(line);\n" +
+                 "        if (returnVal == JFileChooser.APPROVE_OPTION) {\n" +
+                 "            try (BufferedReader br = new BufferedReader(new FileReader(chooser.getSelectedFile().getAbsolutePath()))) {\n" +
+                 "                String line;\n" +
+                 "                while ((line = br.readLine()) != null) {\n" +
+                 "                    if(!line.equals(\"\"))\n" +
+                 "                        lineas.add(line);\n" +
+                 "                }\n" +
                  "            }\n" +
-                 "        }\n" +
-                 "        catch (IOException e){\n" +
-                 "        }\n" +
-                 "        for(String linea: lineas){\n" +
-                 "            for(String palabra: linea.split(\" \")){\n" +
-                 "                if(!isKeyword(palabra)){\n" +
-                 "                    for(char caracter: palabra.toCharArray()){\n";
+                 "            catch (IOException e){\n" +
+                 "            }\n" +
+                 "        }\n";
 
-                //agrega dianmicamente los subconjuntois de characters
-                for (String nombre: arreglorCharacters){
-                    textoFinal += "\t\t\t\t\t\tif(is"+nombre+"(String.valueOf(caracter))){continue;}\n";
+                //agrega dianmicamente los automatas de los tokens
+                for (int x = 0; x < arreglorTokenNames.size(); x++){
+                    textoFinal += "\t\tAutomata is"+arreglorTokenNames.get(x)+" = laClase.analizador(RegExConverter.infixToPostfix(\""+ arreglorTokenContent.get(x)+"\"));\n";
                 }
 
-         textoFinal += "                        else {System.out.printf(\"ERROR [ %c ] no son caracteres reconocidos\\n\",caracter);}\n" +
-                 "                    }\n" +
-                 "                }\n" +
-                 "                else {\n" +
-                 "                    //es una keyword\n" +
-                 "                }\n" +
-                 "            }\n" +
-                 "            textoDeSalida += \"\\n\";\n" +
-                 "        }\n" +
-                 "        System.out.println(textoDeSalida);\n" +
-                 "    }\n" +
-                 "\n}";
+         textoFinal += "for(String linea: lineas){\n" +
+                 "            for(String palabra: linea.split(\" \")){\n" +
+                 "                if(isKeyword(palabra)){\n" +
+                 "                }\n";
+        //agrega dianmicamente las pruebas  de los tokens
+        for (int x = 0; x < arreglorTokenNames.size(); x++){
+            textoFinal += "                else if(laClase.simuladorNFA(is"+arreglorTokenNames.get(x)+",palabra)){\n" +
+                    "                    textoDeSalida += \" <"+ arreglorTokenNames.get(x) +"> \";\n" +
+                    "                }\n";
+        }
+
+        textoFinal += "else {\n" +
+                "                    textoDeSalida += \"No reconocida \";\n" +
+                "                    System.out.printf(\"ERROR [ %s ] no fue reconocida\\n\",palabra);\n" +
+                "                }\n" +
+                "            }\n" +
+                "            textoDeSalida += \"\\n\";\n" +
+                "        }\n" +
+                "        System.out.println(textoDeSalida);\n" +
+                "    }\n" +
+                "\n" +
+                "}\n";
 
 
     }

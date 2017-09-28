@@ -1,59 +1,22 @@
 package Pruebas;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import clasesPrincipales.Automata;
 import clasesPrincipales.RegExConverter;
 import clasesPrincipales.SuperClaseHiperMegaPro;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 public class Lexer {
 
     private static String  textoDeSalida = "";
     private static SuperClaseHiperMegaPro laClase = new SuperClaseHiperMegaPro();
-
-    private static boolean isletter(String entrada) {
-        String tokenName = "letter";
-        String conjunto = "ABCDFGHIJKLMNOPQRSTUVWXYZabcdfghijklmnopqrstuvwxyz";
-        boolean respuesta = conjunto.contains(entrada);
-        if (respuesta) {
-            //textoDeSalida += String.format("<%s, \"%s\"> ",tokenName, entrada);
-            textoDeSalida += String.format("<%s> ", tokenName);
-            return true;
-        } else {
-            return false;
-        }
-    }
-    private static boolean isdigit(String entrada) {
-        String tokenName = "digit";
-        String conjunto = "0123456789";
-        boolean respuesta = conjunto.contains(entrada);
-        if (respuesta) {
-            //textoDeSalida += String.format("<%s, \"%s\"> ",tokenName, entrada);
-            textoDeSalida += String.format("<%s> ", tokenName);
-            return true;
-        } else {
-            return false;
-        }
-    }
-    private static boolean ishexdigit(String entrada) {
-        String tokenName = "hexdigit";
-        String conjunto = "0123456789ABCDEF";
-        boolean respuesta = conjunto.contains(entrada);
-        if (respuesta) {
-            //textoDeSalida += String.format("<%s, \"%s\"> ",tokenName, entrada);
-            textoDeSalida += String.format("<%s> ", tokenName);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
     private static boolean isKeyword(String entrada){
         String tokenName = "keyword";
-        String[] listaDeKeywords = {"palabra reseadaque no hace mach","if","while"};
+        String[] listaDeKeywords = {"palabra reseadaque no hace mach"};
         ArrayList<String> conjunto = new ArrayList<>(Arrays.asList(listaDeKeywords));
         boolean respuesta = conjunto.contains(entrada);
         if (respuesta){
@@ -65,34 +28,33 @@ public class Lexer {
         else {
             return false;
         }
-    }    public static void main(String[] args){
-
-        String regex = "(0|1|2|3|4|5|6|7|8|9)(0|1|2|3|4|5|6|7|8|9)*";
-        Automata nombreDEtyoken = laClase.analizador(RegExConverter.infixToPostfix(regex));
-
-
+    }
+ public static void main(String[] args){
+        //filechooser para ver el escoger el archivo que se esta buscando
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new java.io.File("./src"));
+        chooser.setDialogTitle("Seleccione su archivo");
+        chooser.setFileFilter(new FileNameExtensionFilter("Text files (.txt)", "txt"));
+        int returnVal = chooser.showOpenDialog(null);
         ArrayList<String> lineas = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("test2.txt"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if(!line.equals(""))
-                    lineas.add(line);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            try (BufferedReader br = new BufferedReader(new FileReader(chooser.getSelectedFile().getAbsolutePath()))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if(!line.equals(""))
+                        lineas.add(line);
+                }
+            }
+            catch (IOException e){
             }
         }
-        catch (IOException e){
-        }
-        for(String linea: lineas){
+for(String linea: lineas){
             for(String palabra: linea.split(" ")){
-                if(!isKeyword(palabra)){
-                    for(char caracter: palabra.toCharArray()){
-						if(isletter(String.valueOf(caracter))){continue;}
-						if(isdigit(String.valueOf(caracter))){continue;}
-						if(ishexdigit(String.valueOf(caracter))){continue;}
-                        else {System.out.printf("ERROR [ %c ] no son caracteres reconocidos\n",caracter);}
-                    }
+                if(isKeyword(palabra)){
                 }
-                else {
-                    //es una keyword
+else {
+                    textoDeSalida += "No reconocida ";
+                    System.out.printf("ERROR [ %s ] no fue reconocida\n",palabra);
                 }
             }
             textoDeSalida += "\n";

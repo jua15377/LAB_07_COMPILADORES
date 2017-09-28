@@ -5,6 +5,9 @@ import java.util.Scanner;
 import java.io.*;
 import clasesPrincipales.SuperClaseHiperMegaPro;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 
 /**
  * @author Jonnathan Juarez
@@ -13,12 +16,22 @@ import clasesPrincipales.SuperClaseHiperMegaPro;
 public class Principal {
     public static void main(String args[]) {
 
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new java.io.File("./src"));
+        chooser.setDialogTitle("Seleccione su archivo");
+        chooser.setFileFilter(new FileNameExtensionFilter("Text files (.txt)", "txt"));
+        int returnVal = chooser.showOpenDialog(null);
+        String ruta = "";
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+           ruta = chooser.getSelectedFile().getAbsolutePath();
+        }
+
         AnalizadorSintactico analizadorSintactico = new AnalizadorSintactico();
 // lee el archivo
         Scanner s = null;
         ArrayList<String> arreglo = new ArrayList<>();
         try {
-            s = new Scanner(new BufferedReader(new FileReader("test.txt")));
+            s = new Scanner(new BufferedReader(new FileReader(ruta)));
             while (s.hasNext())
             {
                 String str = s.next();
@@ -35,7 +48,7 @@ public class Principal {
         analizadorSintactico.cocolAnalizer(arreglo);
 
         ArrayList<String> arreglodeDeLineas = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("test.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
             String line;
             while ((line = br.readLine()) != null) {
                 if(!line.equals(""))
